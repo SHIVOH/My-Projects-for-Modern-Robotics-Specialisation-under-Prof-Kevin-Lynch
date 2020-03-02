@@ -1,0 +1,130 @@
+function IKinBodyIterates(Blist, M, T, thetalist0, eomg, ev)
+% Takes Blist: The joint screw axes in the end-effector frame when the
+%              manipulator is at the home position, in the format of a 
+%              matrix with the screw axes as the columns,
+%       M: The home configuration of the end-effector,
+%       T: The desired end-effector configuration Tsd,
+%       thetalist0: An initial guess of joint angles that are close to 
+%                   satisfying Tsd,
+%       eomg: A small positive tolerance on the end-effector orientation
+%             error. The returned joint angles must give an end-effector 
+%             orientation error less than eomg,
+%       ev: A small positive tolerance on the end-effector linear position 
+%           error. The returned joint angles must give an end-effector
+%           position error less than ev.
+
+% Uses an iterative Newton-Raphson root-finding method.
+% The maximum number of iterations before the algorithm is terminated has 
+% been hardcoded in as a variable called maxiterations. It is set to 20 at 
+% the start of the function, but can be changed if needed.  
+% Example Inputs:
+% 
+% clear; clc;
+% Blist = [[0; 0; -1; 2; 0; 0], [0; 0; 0; 0; 1; 0], [0; 0; 1; 0; 0; 0.1]];
+% M = [[-1, 0, 0, 0]; [0, 1, 0, 6]; [0, 0, -1, 2]; [0, 0, 0, 1]];
+% T = [[0, 1, 0, -5]; [1, 0, 0, 4]; [0, 0, -1, 1.6858]; [0, 0, 0, 1]];
+% thetalist0 = [1.5; 2.5; 3];
+% eomg = 0.01;
+% ev = 0.001;
+% IKinBody(Blist, M, T, thetalist0, eomg, ev)
+% 
+% Output:
+% Iteration 0 :
+% 
+% Joint vector :
+%     1.5000    2.5000    3.0000
+% 
+% SE(3) end?effector config: 
+%    -0.0707    0.9975         0   -4.4887
+%     0.9975    0.0707         0    4.3183
+%          0         0   -1.0000    1.7000
+%          0         0         0    1.0000
+% 
+% 
+%  error twist V_b:
+% 0,0,0.0707963,-0.300086,-0.522327,0.0142 
+% 
+% angular error magnitude ||omega_b||: 0.01 
+% linear error magnitude ||v_b||: 0.001 
+% 
+% Iteration 1 :
+% 
+% Joint vector :
+%     1.5824    2.9748    3.1531
+% 
+% SE(3) end?effector config: 
+%    -0.0001    1.0000         0   -4.9744
+%     1.0000    0.0001         0    3.9423
+%          0         0   -1.0000    1.6847
+%          0         0         0    1.0000
+% 
+% 
+%  error twist V_b:
+% 0,0,0.000110787,0.0576917,-0.0255798,-0.00110787 
+% 
+% angular error magnitude ||omega_b||: 0.01 
+% linear error magnitude ||v_b||: 0.001 
+% 
+% Iteration 2 :
+% 
+% Joint vector :
+%     1.5707    2.9997    3.1415
+% 
+% SE(3) end?effector config: 
+%     0.0000    1.0000         0   -4.9997
+%     1.0000   -0.0000         0    4.0003
+%          0         0   -1.0000    1.6858
+%          0         0         0    1.0000
+% 
+% 
+%  error twist V_b:
+% 0,0,-4.60871e-06,-0.000290647,-0.00033301,4.60871e-05 
+% 
+% angular error magnitude ||omega_b||: 0.01 
+% linear error magnitude ||v_b||: 0.001
+
+thetalist = thetalist0;
+i = 0;
+maxiterations = 20;
+Vb = se3ToVec(MatrixLog6(TransInv(FKinBody(M, Blist, thetalist)) * T));
+err = norm(Vb(1: 3)) > eomg || norm(Vb(4: 6)) > ev;
+% initial guess 
+fprintf('Iteration %d :\n\n', i)
+disp('Joint vector :')
+% printing joint vector values
+disp(thetalist')
+fprintf('SE(3) end-effector config: \n')
+%Displaying present Transformation matrix
+disp(FKinBody(M, Blist, thetalist))
+fprintf('\n error twist V_b:\n')
+% Displaying Vb
+fprintf('%g,%g,%g,%g,%g,%g \n\n', Vb(1),Vb(2),Vb(3),Vb(4),Vb(5),Vb(6))
+fprintf('angular error magnitude ||omega_b||: %g \n',eomg)
+fprintf ('linear error magnitude ||v_b||: %g \n\n',ev)
+%Initializing vector matrix
+finalmatx = [];
+%Adding rows on each iteration
+finalmatx = [finalmatx , thetalist'];
+
+
+while err && i < maxiterations
+    thetalist = thetalist + pinv(JacobianBody(Blist, thetalist)) * Vb;
+    i = i + 1;
+    Vb = se3ToVec(MatrixLog6(TransInv(FKinBody(M, Blist, thetalist)) * T));
+    err = norm(Vb(1: 3)) > eomg || norm(Vb(4: 6)) > ev;
+    fprintf('Iteration %d :\n\n' , i)
+    disp('Joint vector :')
+    disp(thetalist')
+
+    fprintf('SE(3) end-effector config: \n')
+    disp(FKinBody(M, Blist, thetalist))
+    fprintf('\n error twist V_b:\n')
+    fprintf('%g,%g,%g,%g,%g,%g \n\n', Vb(1),Vb(2),Vb(3),Vb(4),Vb(5),Vb(6))
+    fprintf('angular error magnitude ||omega_b||: %g \n',eomg)
+    fprintf ('linear error magnitude ||v_b||: %g \n\n',ev)
+    finalmatx = [finalmatx ; thetalist'];
+end
+success = ~ err;
+%creating the csv file
+csvwrite('iterates.csv',finalmatx)
+end
