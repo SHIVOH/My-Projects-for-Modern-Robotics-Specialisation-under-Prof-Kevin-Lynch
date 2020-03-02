@@ -1,0 +1,49 @@
+m =
+
+     5     1     5
+     4    10     2
+
+
+contacts =
+
+    1.0000         0         0         0    1.5708    0.2000
+    1.0000    2.0000    5.0000    5.0000    0.7854    0.3000
+    2.0000         0    6.0000         0    1.5708    0.4000
+    2.0000         0   11.0000         0    1.5708    0.4000
+
+Exiting: One or more of the residuals, duality gap, or total relative error
+ has stalled:
+         the primal appears to be infeasible and the dual unbounded since
+         the dual objective > 1e+10
+         and the primal objective > -1e+6.
+Optimization terminated.
+k = 
+ans =
+
+   39.2075    6.0391   25.1376    0.9978    6.3656    5.2965   13.6716   18.3880    1.0000    1.0000
+
+the assembly would collapse
+
+
+
+m =
+
+     2     1     5
+     4    10     2
+
+
+contacts =
+
+    1.0000         0         0         0    1.5708    0.8000
+    1.0000    2.0000    5.0000    5.0000    0.7854    0.6000
+    2.0000         0    6.0000         0    1.5708    0.4000
+    2.0000         0   11.0000         0    1.5708    0.4000
+
+Optimization terminated.
+Optimization terminated.
+k = 
+ans =
+
+   10.4538    6.4188    6.3930    1.0000    6.2628    5.0632   13.8891   18.3538    1.0000    1.0000
+
+the assembly remains standing
