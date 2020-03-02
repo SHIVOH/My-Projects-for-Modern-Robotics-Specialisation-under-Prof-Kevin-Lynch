@@ -1,0 +1,57 @@
+points =
+
+     0     0
+     0     0
+     2     1
+     2     1
+
+>> thetas = [180,270,0,90]
+
+thetas =
+
+   180   270     0    90
+
+>> [success,val] =project51(points,thetas) 
+Optimization terminated.
+
+success =
+
+True
+
+
+val =
+
+    2.0000
+    1.0000
+    2.0000
+    1.0000
+
+>> points = [[0,0];[0,0];[2,0];[2,0]]
+
+points =
+
+     0     0
+     0     0
+     2     0
+     2     0
+
+>> thetas = [180,270,0,270]
+
+thetas =
+
+   180   270     0   270
+
+>> [success,val] =project51(points,thetas)
+Exiting: One or more of the residuals, duality gap, or total relative error
+ has grown 100000 times greater than its minimum value so far:
+         the primal appears to be infeasible (and the dual unbounded).
+         (The dual residual < OptimalityTolerance=1.00e-08.)
+
+success =
+
+False
+
+
+val =
+
+     []

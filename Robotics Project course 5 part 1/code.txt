@@ -1,0 +1,32 @@
+function [result,B] = project51(points,thetas)
+%number of contacts are calculated
+contacts = size(points,1);
+%initialising the Forse matrix
+F=[];
+%default result
+result = 'False';
+%default value
+B =[];
+%iterating to add the colums into force vector
+for i = 1:contacts %calculating for each force
+    
+    point = [points(i,1),points(i,2),0];%point of contact
+    theta = [cosd(thetas(i)),sind(thetas(i)),0];%direction of the normal force
+    M = cross(point,theta); %moment matrix 
+    F = [F;M(3),theta(1),theta(2)]; %adding the colums
+    
+end
+%As per the suggestions from 12.7.7.2 of the text book 
+f = [1,1,1,1];
+A = [[-1,0,0,0];[0,-1,0,0];[0,0,-1,0];[0,0,0,-1]];
+b = [-1,-1,-1,-1];
+Aeq = F';
+beq =[0,0,0];
+a = linprog(f,A,b,Aeq,beq);
+%if the program finds value of a
+if a >0
+    result = 'True';
+    B = a;
+end
+    
+end
