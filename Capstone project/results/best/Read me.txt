@@ -1,0 +1,3 @@
+Hi, i have implemented the tasks exactly as mentioned in the wiki using matlab. i encountered lot of errors and after 5-6 days of continous iteration, finally reached the approximate results.
+i have used a velocity limits to the joints and provided singularity constraints while using the psudo inverse. The challenging part is finding the suitable gain matrices for the relevent trajectory.
+Hope you appriciate my effort and thankyou for reviewing.
